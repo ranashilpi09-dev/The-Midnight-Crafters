@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Owner Dashboard – T&S Co.</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Lato', sans-serif; background: #D8D8FF; min-height: 100vh; }
+  #oapp { position: relative; overflow: hidden; min-height: 100vh; }
+  .sparkle-bg { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+  .sp { position: absolute; border-radius: 50%; animation: twinkle 2s infinite alternate; }
+  @keyframes twinkle { 0%{opacity:0.2;transform:scale(0.5);} 100%{opacity:1;transform:scale(1.2);} }
+  .inner { position: relative; z-index: 1; padding-bottom: 2rem; max-width: 480px; margin: 0 auto; }
+  .topbar { background: linear-gradient(135deg, #6C3483, #9B59B6, #C39BD3); padding: 12px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 2px solid #E8B4F8; position: sticky; top: 0; z-index: 10; }
+  .brand h1 { font-family: 'Playfair Display', serif; font-size: 15px; color: #fff; font-weight: 700; }
+  .brand p { font-size: 11px; color: #FFE4EC; }
+  .owner-badge { background: #FFB7C5; border-radius: 12px; padding: 4px 12px; font-size: 11px; font-weight: 700; color: #6C3483; }
+  .nav-tabs { display: flex; background: rgba(107,52,131,0.15); border-bottom: 1px solid #C39BD3; overflow-x: auto; position: sticky; top: 65px; z-index: 9; }
+  .nav-tab { padding: 10px 14px; font-size: 11px; font-weight: 700; color: #6C3483; cursor: pointer; border-bottom: 3px solid transparent; white-space: nowrap; background: none; border-top:none; border-left:none; border-right:none; }
+  .nav-tab.active { border-bottom-color: #9B59B6; background: rgba(255,183,197,0.3); }
+  .page { display: none; padding: 14px; }
+  .page.active { display: block; }
+  .section-title { font-family: 'Playfair Display', serif; font-size: 18px; color: #6C3483; margin-bottom: 8px; text-align: center; margin-top: 10px; }
+  .glitter { text-align: center; font-size: 13px; color: #C39BD3; margin: 4px 0 14px; letter-spacing: 4px; }
+  .card { background: linear-gradient(135deg, #EAD8FF, #FFE4EC); border: 1.5px dashed #C39BD3; border-radius: 14px; padding: 14px; margin-bottom: 14px; }
+  .card h3 { font-family: 'Playfair Display', serif; font-size: 14px; color: #6C3483; margin-bottom: 10px; }
+  .fg { margin-bottom: 8px; }
+  .fg label { font-size: 11px; font-weight: 700; color: #6C3483; display: block; margin-bottom: 3px; }
+  .fg input, .fg textarea, .fg select { width: 100%; border: 1.5px solid #C39BD3; border-radius: 10px; padding: 8px 10px; font-size: 12px; background: #fff; color: #6C3483; font-family: 'Lato', sans-serif; }
+  .fg textarea { height: 56px; resize: none; }
+  .save-btn { background: linear-gradient(135deg, #9B59B6, #6C3483); color: #fff; border: none; border-radius: 20px; padding: 9px 20px; font-size: 12px; font-weight: 700; cursor: pointer; width: 100%; margin-top: 4px; font-family: 'Lato', sans-serif; }
+  .owner-item-card { background: linear-gradient(135deg, #fff 60%, #FFE4EC); border: 1.5px solid #E8B4F8; border-radius: 14px; padding: 12px; margin-bottom: 10px; }
+  .item-row { display: flex; gap: 10px; align-items: flex-start; }
+  .item-thumb { width: 56px; height: 56px; border-radius: 10px; background: #EAD8FF; border: 1.5px solid #C39BD3; display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; overflow:hidden; }
+  .item-thumb img { width:56px; height:56px; object-fit:cover; border-radius:10px; }
+  .item-meta .nm { font-family: 'Playfair Display', serif; font-size: 13px; color: #6C3483; font-weight: 700; }
+  .item-meta .pr { font-size: 12px; color: #D85A8A; font-weight: 700; }
+  .item-meta .ca { font-size: 11px; color: #9B59B6; }
+  .btn-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  .oos-tog { font-size: 11px; font-weight: 700; padding: 5px 10px; border-radius: 14px; cursor: pointer; }
+  .btn-oos { background: #FFE4EC; color: #D85A8A; border: 1.5px solid #FFB7C5; }
+  .btn-instock { background: #E8F8EE; color: #2E7D52; border: 1.5px solid #9FE1CB; }
+  .btn-del { background: #fff; color: #D85A8A; border: 1.5px solid #FFB7C5; font-size: 11px; padding: 5px 10px; border-radius: 14px; cursor: pointer; }
+  .order-card { background: #fff; border: 1.5px solid #E8B4F8; border-radius: 14px; padding: 12px; margin-bottom: 10px; }
+  .order-card.done-order { opacity: 0.5; border-color: #9FE1CB; }
+  .order-name { font-family: 'Playfair Display', serif; font-size: 13px; color: #6C3483; font-weight: 700; }
+  .order-time { font-size: 10px; color: #9B59B6; }
+  .order-addr { font-size: 11px; color: #9B59B6; margin: 4px 0 6px; }
+  .order-item-row { padding: 4px 0; border-bottom: 0.5px solid #E8B4F8; font-size: 11px; color: #6C3483; }
+  .order-custom { font-size: 10px; color: #9B59B6; font-style: italic; }
+  .tick-btn { background: #E8F8EE; color: #2E7D52; border: 1.5px solid #9FE1CB; border-radius: 14px; padding: 6px 12px; font-size: 12px; font-weight: 700; cursor: pointer; }
+  .done-badge { background: #E8F8EE; color: #2E7D52; border-radius: 10px; padding: 3px 10px; font-size: 10px; font-weight: 700; }
+  .about-card { background: linear-gradient(135deg, #fff 60%, #FFE4EC); border: 1.5px solid #E8B4F8; border-radius: 14px; padding: 14px; margin-bottom: 12px; }
+  .about-card h3 { font-family: 'Playfair Display', serif; font-size: 14px; color: #6C3483; margin-bottom: 8px; }
+  .upload-mini { border: 2px dashed #C39BD3; border-radius: 10px; padding: 10px; text-align: center; color: #9B59B6; font-size: 11px; cursor: pointer; background: rgba(255,255,255,0.5); margin-bottom: 6px; }
+  .img-upload-area { border: 2px dashed #C39BD3; border-radius: 10px; padding: 8px; text-align: center; color: #9B59B6; font-size: 11px; cursor: pointer; background: rgba(255,255,255,0.5); }
+  .ev-item { background: #fff; border: 1.5px solid #E8B4F8; border-radius: 12px; padding: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+  .ev-info .et { font-family: 'Playfair Display', serif; font-size: 13px; color: #6C3483; font-weight: 700; }
+  .ev-info .ed { font-size: 11px; color: #9B59B6; }
+  .ref-thumb { width: 48px; height: 48px; border-radius: 8px; object-fit: cover; border: 1.5px solid #C39BD3; margin-top: 4px; }
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #6C3483; color: #fff; padding: 9px 22px; border-radius: 20px; font-size: 12px; font-weight: 700; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 999; white-space: nowrap; }
+  .toast.show { opacity: 1; }
+  .empty-msg { text-align: center; color: #C39BD3; font-size: 13px; padding: 24px; font-style: italic; }
+</style>
+</head>
+<body>
+<div id="oapp">
+  <div class="sparkle-bg" id="sparkles"></div>
+  <div class="inner">
+    <div class="topbar">
+      <div style="width:44px;height:44px;border-radius:50%;border:2px solid #FFB7C5;background:#6C3483;display:flex;align-items:center;justify-content:center;font-size:18px;color:#FFB7C5;flex-shrink:0;">✦</div>
+      <div class="brand" style="flex:1;">
+        <h1>Owner Dashboard</h1>
+        <p>T&S Co. ✦ Midnight Crafters</p>
+      </div>
+      <span class="owner-badge">Owner</span>
+    </div>
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="oTab('menu',this)">✦ Menu</button>
+      <button class="nav-tab" onclick="oTab('orders',this)">✦ Orders</button>
+      <button class="nav-tab" onclick="oTab('events',this)">✦ Events</button>
+      <button class="nav-tab" onclick="oTab('about',this)">✦ About Us</button>
+    </div>
+
+    <div class="page active" id="opage-menu">
+      <div class="section-title">Manage Menu</div>
+      <div class="glitter">✦ ✦ ✦</div>
+      <div class="card">
+        <h3>✦ Add New Item</h3>
+        <div class="fg"><label>Item Name</label><input id="ni-name" placeholder="e.g. Glitter Pen Set"></div>
+        <div class="fg"><label>Category</label>
+          <select id="ni-cat"><option>Stationery</option><option>Craft</option><option>Baked Goods</option><option>Other</option></select>
+        </div>
+        <div class="fg"><label>Description</label><textarea id="ni-desc" placeholder="Short description..."></textarea></div>
+        <div class="fg"><label>Price (e.g. ₹80)</label><input id="ni-price" placeholder="₹80"></div>
+        <div class="fg"><label>Emoji (optional)</label><input id="ni-emoji" placeholder="🎨" style="width:80px;"></div>
+        <div class="fg">
+          <label>Item Photo</label>
+          <div class="img-upload-area" onclick="document.getElementById('ni-img-input').click()">📷 Tap to upload photo</div>
+          <input type="file" id="ni-img-input" accept="image/*" style="display:none;" onchange="previewNewItem(event)">
+          <img id="ni-img-preview" style="display:none;width:64px;height:64px;border-radius:10px;object-fit:cover;border:1.5px solid #C39BD3;margin-top:6px;">
+        </div>
+        <button class="save-btn" onclick="addItem()">✦ Add to Menu</button>
+      </div>
+      <div id="ownerItemList"></div>
+    </div>
+
+    <div class="page" id="opage-orders">
+      <div class="section-title">Incoming Orders</div>
+      <div class="glitter">✦ ✦ ✦</div>
+      <div id="ordersList"></div>
+    </div>
+
+    <div class="page" id="opage-events">
+      <div class="section-title">Baking Events</div>
+      <div class="glitter">✦ ✦ ✦</div>
+      <div class="card">
+        <h3>✦ Announce New Event</h3>
+        <div class="fg"><label>Event Title</label><input id="ev-title" placeholder="e.g. Cookie Bake Sale!"></div>
+        <div class="fg"><label>Date</label><input id="ev-date" type="date"></div>
+        <div class="fg"><label>Time</label><input id="ev-time" type="time"></div>
+        <div class="fg"><label>Description</label><textarea id="ev-desc" placeholder="What are you baking?"></textarea></div>
+        <button class="save-btn" onclick="addEvent()">✦ Announce Event</button>
+      </div>
+      <div id="ownerEventsList"></div>
+    </div>
+
+    <div class="page" id="opage-about">
+      <div class="section-title">About Us Editor</div>
+      <div class="glitter">✦ ✦ ✦</div>
+      <div class="about-card">
+        <h3>✦ Triansha</h3>
+        <div class="upload-mini" onclick="document.getElementById('img-triansha').click()">📷 Upload photo</div>
+        <input type="file" id="img-triansha" accept="image/*" style="display:none;" onchange="uploadAboutImg(event,'triansha')">
+        <img id="prev-triansha" style="display:none;width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid #9B59B6;margin-bottom:6px;">
+        <div class="fg"><label>About Triansha</label><textarea id="bio-triansha" placeholder="Write about Triansha..."></textarea></div>
+        <button class="save-btn" onclick="saveAbout()">✦ Save</button>
+      </div>
+      <div class="about-card">
+        <h3>✦ Shloka</h3>
+        <div class="upload-mini" onclick="document.getElementById('img-shloka').click()">📷 Upload photo</div>
+        <input type="file" id="img-shloka" accept="image/*" style="display:none;" onchange="uploadAboutImg(event,'shloka')">
+        <img id="prev-shloka" style="display:none;width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid #9B59B6;margin-bottom:6px;">
+        <div class="fg"><label>About Shloka</label><textarea id="bio-shloka" placeholder="Write about Shloka..."></textarea></div>
+        <button class="save-btn" onclick="saveAbout()">✦ Save</button>
+      </div>
+      <div class="about-card">
+        <h3>✦ Our Products</h3>
+        <div class="fg"><label>About your products</label><textarea id="bio-products" placeholder="Tell customers about your products..."></textarea></div>
+        <button class="save-btn" onclick="saveAbout()">✦ Save All</button>
+      </div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+const STORAGE_KEY = 'tsc_shared_data';
+let newItemImg = '';
+let aboutImgs = {};
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+function getShared() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || getDefaultData(); } catch(e) { return getDefaultData(); }
+}
+function getDefaultData() {
+  return {
+    items: [
+      {id:1,name:'Bookmark Set',cat:'Stationery',desc:'Set of 4 handmade bookmarks',price:'₹80',emoji:'🔖',inStock:true,img:''},
+      {id:2,name:'Washi Tape',cat:'Stationery',desc:'Glittery washi tape roll',price:'₹60',emoji:'🎀',inStock:true,img:''},
+      {id:3,name:'Crochet Keychain',cat:'Craft',desc:'Cute hand-crocheted keychain',price:'₹120',emoji:'🧶',inStock:true,img:''},
+      {id:4,name:'Decorated Notebook',cat:'Stationery',desc:'Personalized decorated notebook',price:'₹150',emoji:'📓',inStock:true,img:''},
+      {id:5,name:'Chocolate Cupcake',cat:'Baked Goods',desc:'Rich homemade chocolate cupcake',price:'₹40',emoji:'🧁',inStock:true,img:''},
+    ],
+    events:[], about:{triansha:'',trianshaImg:'',shloka:'',shlokaImg:'',products:''}, orders:[]
+  };
+}
+function saveShared(data) { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+
+function oTab(tab, el) {
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('opage-'+tab).classList.add('active');
+  if(el) el.classList.add('active');
+  if(tab==='menu') renderOwnerMenu();
+  if(tab==='orders') renderOrders();
+  if(tab==='events') renderOwnerEvents();
+  if(tab==='about') loadAboutEditor();
+}
+
+function renderOwnerMenu() {
+  const data = getShared();
+  if(!data.items.length) { document.getElementById('ownerItemList').innerHTML='<div class="empty-msg">No items yet. Add one above!</div>'; return; }
+  let html = '';
+  data.items.forEach((item,idx) => {
+    const stockLabel = item.inStock ? 'Mark Out of Stock' : 'Mark In Stock';
+    const stockClass = item.inStock ? 'btn-oos' : 'btn-instock';
+    const imgHTML = item.img
+      ? `<div class="item-thumb"><img src="${item.img}" alt="${item.name}"></div>`
+      : `<div class="item-thumb">${item.emoji||'✨'}</div>`;
+    const stockBadge = item.inStock ? '' : '<span style="font-size:10px;color:#D85A8A;font-weight:700;"> (Out of Stock)</span>';
+    html += `<div class="owner-item-card">
+      <div class="item-row">${imgHTML}
+        <div class="item-meta" style="flex:1;">
+          <div class="nm">${item.name}${stockBadge}</div>
+          <div class="ca">${item.cat}</div>
+          <div class="pr">${item.price}</div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="oos-tog ${stockClass}" onclick="toggleStock(${idx})">${stockLabel}</button>
+        <button class="btn-del" onclick="deleteItem(${idx})">🗑 Delete</button>
+      </div>
+    </div>`;
+  });
+  document.getElementById('ownerItemList').innerHTML = html;
+}
+
+function toggleStock(idx) {
+  const data = getShared();
+  data.items[idx].inStock = !data.items[idx].inStock;
+  saveShared(data);
+  renderOwnerMenu();
+  showToast(data.items[idx].inStock ? 'Marked as in stock ✨' : 'Marked as out of stock');
+}
+
+function deleteItem(idx) {
+  const data = getShared();
+  const name = data.items[idx].name;
+  data.items.splice(idx,1);
+  saveShared(data);
+  renderOwnerMenu();
+  showToast(name + ' deleted ✨');
+}
+
+function previewNewItem(e) {
+  const file = e.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => { newItemImg=ev.target.result; document.getElementById('ni-img-preview').src=ev.target.result; document.getElementById('ni-img-preview').style.display='block'; };
+  reader.readAsDataURL(file);
+}
+
+function addItem() {
+  const name=document.getElementById('ni-name').value.trim();
+  const cat=document.getElementById('ni-cat').value;
+  const desc=document.getElementById('ni-desc').value.trim();
+  const price=document.getElementById('ni-price').value.trim();
+  const emoji=document.getElementById('ni-emoji').value.trim()||'✨';
+  if(!name||!price){showToast('Please fill the name and price!');return;}
+  const data=getShared();
+  data.items.push({id:Date.now(),name,cat,desc,price,emoji,inStock:true,img:newItemImg});
+  saveShared(data);
+  document.getElementById('ni-name').value='';
+  document.getElementById('ni-desc').value='';
+  document.getElementById('ni-price').value='';
+  document.getElementById('ni-emoji').value='';
+  document.getElementById('ni-img-preview').style.display='none';
+  newItemImg='';
+  renderOwnerMenu();
+  showToast(name+' added to menu ✨');
+}
+
+function renderOrders() {
+  const data=getShared();
+  const orders=data.orders||[];
+  if(!orders.length){document.getElementById('ordersList').innerHTML='<div class="empty-msg">No orders yet ✦</div>';return;}
+  let html='';
+  orders.forEach((order,idx)=>{
+    let itemsHTML='';
+    (order.items||[]).forEach(oi=>{
+      itemsHTML+=`<div class="order-item-row">
+        <span style="font-weight:700;">${oi.name}</span> — <span style="color:#D85A8A;">${oi.price}</span>
+        ${oi.customText?`<div class="order-custom">Customization: ${oi.customText}</div>`:''}
+        ${oi.refPreview?`<img src="${oi.refPreview}" class="ref-thumb">`:''}
+      </div>`;
+    });
+    html+=`<div class="order-card ${order.done?'done-order':''}">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+        <div>
+          <div class="order-name">${order.name} ${order.done?'<span class="done-badge">✓ Done</span>':''}</div>
+          <div class="order-time">${order.timestamp}</div>
+        </div>
+        ${!order.done?`<button class="tick-btn" onclick="markDone(${idx})">✓ Mark Done</button>`:''}
+      </div>
+      <div class="order-addr">📍 ${order.address} &nbsp;|&nbsp; 📞 ${order.phone||'—'}</div>
+      <div>${itemsHTML}</div>
+    </div>`;
+  });
+  document.getElementById('ordersList').innerHTML=html;
+}
+
+function markDone(idx) {
+  const data=getShared(); data.orders[idx].done=true; saveShared(data); renderOrders(); showToast('Order marked as done ✨');
+}
+
+function renderOwnerEvents() {
+  const data=getShared(); const events=data.events||[];
+  if(!events.length){document.getElementById('ownerEventsList').innerHTML='<div class="empty-msg">No events yet ✦</div>';return;}
+  let html='';
+  events.forEach((ev,idx)=>{
+    html+=`<div class="ev-item">
+      <div class="ev-info"><div class="et">✦ ${ev.title}</div><div class="ed">${ev.date} ${ev.time}</div></div>
+      <button class="btn-del" onclick="deleteEvent(${idx})">🗑</button>
+    </div>`;
+  });
+  document.getElementById('ownerEventsList').innerHTML=html;
+}
+
+function addEvent() {
+  const title=document.getElementById('ev-title').value.trim();
+  const date=document.getElementById('ev-date').value;
+  const time=document.getElementById('ev-time').value;
+  const desc=document.getElementById('ev-desc').value.trim();
+  if(!title||!date){showToast('Please fill the event title and date!');return;}
+  const data=getShared(); data.events=data.events||[];
+  data.events.unshift({title,date,time,desc}); saveShared(data);
+  document.getElementById('ev-title').value=''; document.getElementById('ev-date').value='';
+  document.getElementById('ev-time').value=''; document.getElementById('ev-desc').value='';
+  renderOwnerEvents(); showToast('Event announced ✨');
+}
+
+function deleteEvent(idx) {
+  const data=getShared(); data.events.splice(idx,1); saveShared(data); renderOwnerEvents(); showToast('Event deleted');
+}
+
+function uploadAboutImg(e,person) {
+  const file=e.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=ev=>{aboutImgs[person]=ev.target.result; document.getElementById('prev-'+person).src=ev.target.result; document.getElementById('prev-'+person).style.display='block';};
+  reader.readAsDataURL(file);
+}
+
+function loadAboutEditor() {
+  const data=getShared(); const ab=data.about||{};
+  document.getElementById('bio-triansha').value=ab.triansha||'';
+  document.getElementById('bio-shloka').value=ab.shloka||'';
+  document.getElementById('bio-products').value=ab.products||'';
+  if(ab.trianshaImg){document.getElementById('prev-triansha').src=ab.trianshaImg;document.getElementById('prev-triansha').style.display='block';}
+  if(ab.shlokaImg){document.getElementById('prev-shloka').src=ab.shlokaImg;document.getElementById('prev-shloka').style.display='block';}
+}
+
+function saveAbout() {
+  const data=getShared(); data.about=data.about||{};
+  data.about.triansha=document.getElementById('bio-triansha').value;
+  data.about.shloka=document.getElementById('bio-shloka').value;
+  data.about.products=document.getElementById('bio-products').value;
+  if(aboutImgs.triansha) data.about.trianshaImg=aboutImgs.triansha;
+  if(aboutImgs.shloka) data.about.shlokaImg=aboutImgs.shloka;
+  saveShared(data); showToast('About Us saved ✨');
+}
+
+function makeSparkles() {
+  const bg=document.getElementById('sparkles');
+  const colors=['#E8B4F8','#FFB7C5','#CCCCFF','#fff','#C39BD3'];
+  for(let i=0;i<40;i++){
+    const el=document.createElement('div'); el.className='sp';
+    const size=Math.random()*5+2;
+    el.style.cssText=`width:${size}px;height:${size}px;background:${colors[Math.floor(Math.random()*colors.length)]};left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*3}s;animation-duration:${1.5+Math.random()*2}s;position:absolute;`;
+    bg.appendChild(el);
+  }
+}
+
+makeSparkles();
+renderOwnerMenu();
+setInterval(()=>{const a=document.querySelector('.page.active');if(a&&a.id==='opage-orders')renderOrders();},4000);
+</script>
+</body>
+</html>
